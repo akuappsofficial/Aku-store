@@ -104,15 +104,36 @@ function setupHeaderActions() {
   const devDashboardBtn = document.getElementById('devDashboardBtn');
   if (devDashboardBtn) {
     devDashboardBtn.addEventListener('click', () => {
-      window.location.href = 'developer.html';
+      const session = localStorage.getItem('aku_store_session');
+      if (!session) {
+        alert("Please sign in to access the developer console.");
+        window.location.href = 'auth.html';
+        return;
+      }
+      const user = JSON.parse(session);
+      if (user.role === 'developer' || user.role === 'admin' || user.role === 'staff') {
+        window.location.href = 'developer.html';
+      } else {
+        alert("Developer permissions required. Please submit an application from your Account page.");
+        window.location.href = 'auth.html';
+      }
     });
   }
 
   const userProfileBtn = document.getElementById('userProfileBtn');
   if (userProfileBtn) {
     userProfileBtn.addEventListener('click', () => {
-      alert("Profile and Authentication setup coming in Phase 5!");
+      window.location.href = 'auth.html';
     });
+
+    // Check session avatar
+    const session = localStorage.getItem('aku_store_session');
+    if (session) {
+      const user = JSON.parse(session);
+      if (user.avatar) {
+        userProfileBtn.innerHTML = `<img src="${user.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+      }
+    }
   }
 }
 
