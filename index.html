@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Aku Store | Android Apps</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Material Symbols for Google-style icons -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+</head>
+<body>
+
+  <!-- Top Navigation (Search & Profile) -->
+  <header class="top-nav">
+    <div class="logo">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Google_Play_Arrow_logo.svg" alt="Play Logo" class="play-icon">
+      <span>Aku Store</span>
+    </div>
+    
+    <div class="search-container">
+      <span class="material-symbols-outlined search-icon">search</span>
+      <input type="text" id="searchInput" placeholder="Search for apps & games">
+    </div>
+
+    <div class="user-actions">
+      <span class="material-symbols-outlined icon-btn" id="devDashboardBtn">developer_mode</span>
+      <div class="profile-avatar" id="userProfileBtn">
+        <span class="material-symbols-outlined">person</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Category Navigation -->
+  <nav class="category-tabs">
+    <button class="tab active" data-category="apps">Apps</button>
+    <button class="tab" data-category="games">Games</button>
+    <button class="tab" data-category="recent">Recent</button>
+  </nav>
+
+  <!-- Main App Grid -->
+  <main class="store-content">
+    <section class="app-section">
+      <h2 class="section-title">Recommended for you</h2>
+      <div class="app-grid" id="appGridContainer">
+        <!-- JavaScript will inject the app cards here later -->
+      </div>
+    </section>
+  </main>
+
+</body>
+</html>
