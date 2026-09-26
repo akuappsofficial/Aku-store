@@ -79,11 +79,9 @@ function setupTabs() {
   });
 }
 
-// Function to handle clicking an app (Dynamic Routing prep)
+// Replace the old openAppDetails function with this:
 function openAppDetails(appId) {
-  // In Phase 3, this will redirect to a dedicated app page, e.g., app.html?id=com.aku.vitsdemo
-  console.log(`Navigating to app details for: ${appId}`);
-  alert(`Routing to details page for App ID: ${appId}`);
+  window.location.href = `app.html?id=${appId}`;
 }
 
 // Initialize the store when the page loads
