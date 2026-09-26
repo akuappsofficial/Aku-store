@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Admin Portal | Aku Store</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+</head>
+<body>
+
+  <header class="top-nav">
+    <div class="logo" id="backToStoreBtn">
+      <span class="material-symbols-outlined icon-btn">arrow_back</span>
+      <span>Aku Store Admin Console</span>
+    </div>
+  </header>
+
+  <main class="detail-container">
+    <h1 class="section-title">Developer Approval Requests</h1>
+    <p style="color: var(--text-secondary); margin-bottom: 2rem;">Review pending publisher applications and upgrade user roles.</p>
+
+    <!-- Application List Container -->
+    <div id="requestsListContainer" style="display: flex; flex-direction: column; gap: 1rem;">
+      <!-- Dynamic list rendered by admin.js -->
+    </div>
+
+    <h1 class="section-title" style="margin-top: 3rem;">User Role Management</h1>
+    <div id="usersListContainer" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+      <!-- Dynamic user list -->
+    </div>
+  </main>
+
+  <script src="admin.js"></script>
+</body>
+</html> 
