@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Car Game | Aku Store</title>
+  <style>
+    :root {
+      --bg1: #0b1220;
+      --bg2: #101a2a;
+      --road: #1f2b38;
+      --lane: rgba(255,255,255,0.35);
+      --grass: #1b7f35;
+      --player: #34d399;
+      --enemy: #f87171;
+      --gold: #facc15;
+      --text: #e5eefb;
+      --panel: rgba(15, 23, 42, 0.82);
+      --accent: #7dd3fc;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, var(--bg1), var(--bg2));
+      color: var(--text);
+    }
+
+    .game-shell {
+      width: min(92vw, 440px);
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 18px 60px rgba(0,0,0,0.35);
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .score {
+      background: rgba(255,255,255,0.08);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.95rem;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #1d2938, #0f172a);
+      border: 2px solid rgba(255,255,255,0.08);
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button {
+      flex: 1;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .primary {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+    }
+
+    .secondary {
+      background: rgba(125, 211, 252, 0.15);
+      color: var(--text);
+      border: 1px solid rgba(125, 211, 252, 0.3);
+    }
+
+    .status {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      text-align: center;
+      color: #cbd5e1;
+      min-height: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-shell">
+    <div class="topbar">
+      <div>Car Dodge</div>
+      <div class="score">Score: <span id="score">0</span></div>
+    </div>
+
+    <canvas id="gameCanvas" width="360" height="620" aria-label="Car game"></canvas>
+
+    <div class="controls">
+      <button id="startBtn" class="primary">Start</button>
+      <button id="homeBtn" class="secondary">Back</button>
+    </div>
+
+    <div id="status" class="status">Use arrow keys or A/D to move.</div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score');
+    const startBtn = document.getElementById('startBtn');
+    const homeBtn = document.getElementById('homeBtn');
+    const statusEl = document.getElementById('status');
+
+    const road = {
+      width: 220,
+      x: (canvas.width - 220) / 2,
+      laneWidth: 70,
+      lanes: 3
+    };
+
+    let animationFrameId = null;
+    let gameStarted = false;
+    let gameOver = false;
+    let lastTime = 0;
+    let spawnTimer = 0;
+    let score = 0;
+    let highScore = Number(localStorage.getItem('aku_car_game_high_score') || 0);
+
+    const player = {
+      x: canvas.width / 2,
+      y: canvas.height - 90,
+      width: 34,
+      height: 62,
+      speed: 220,
+      moveLeft: false,
+      moveRight: false
+    };
+
+    const obstacles = [];
+
+    function resetGame() {
+      player.x = canvas.width / 2;
+      player.y = canvas.height - 90;
+      obstacles.length = 0;
+      spawnTimer = 0;
+      score = 0;
+      scoreEl.textContent = '0';
+      gameOver = false;
+      lastTime = 0;
+      statusEl.textContent = 'Use arrow keys or A/D to move.';
+    }
+
+    function startGame() {
+      resetGame();
+      gameStarted = true;
+      startBtn.textContent = 'Restart';
+      statusEl.textContent = 'Avoid the traffic!';
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      animationFrameId = requestAnimationFrame(gameLoop);
+    }
+
+    function endGame() {
+      gameOver = true;
+      gameStarted = false;
+      if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('aku_car_game_high_score', String(highScore));
+      }
+      statusEl.textContent = `Crash! Final score: ${score}. High score: ${highScore}.`;
+      startBtn.textContent = 'Play Again';
+    }
+
+    function updatePlayer(delta) {
+      const direction = (player.moveRight ? 1 : 0) - (player.moveLeft ? 1 : 0);
+      player.x += direction * player.speed * delta;
+      player.x = Math.max(road.x + 12, Math.min(player.x, road.x + road.width - player.width - 12));
+    }
+
+    function spawnObstacle() {
+      const lane = Math.floor(Math.random() * road.lanes);
+      const laneX = road.x + lane * road.laneWidth + 18;
+      const obstacleWidth = 32;
+      const obstacleHeight = 60;
+      obstacles.push({
+        x: laneX,
+        y: -70,
+        width: obstacleWidth,
+        height: obstacleHeight,
+        speed: 180 + Math.random() * 110,
+        color: Math.random() > 0.5 ? '#f87171' : '#fbbf24'
+      });
+    }
+
+    function updateObstacles(delta) {
+      for (let i = obstacles.length - 1; i >= 0; i--) {
+        const obs = obstacles[i];
+        obs.y += obs.speed * delta;
+
+        if (obs.y > canvas.height + 80) {
+          obstacles.splice(i, 1);
+          score += 10;
+          scoreEl.textContent = String(score);
+          continue;
+        }
+
+        const hit =
+          player.x < obs.x + obs.width &&
+          player.x + player.width > obs.x &&
+          player.y < obs.y + obs.height &&
+          player.y + player.height > obs.y;
+
+        if (hit) {
+          endGame();
+          return;
+        }
+      }
+    }
+
+    function drawBackground() {
+      ctx.fillStyle = '#1f2937';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#1b7f35';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#2d3748';
+      ctx.fillRect(road.x, 0, road.width, canvas.height);
+
+      ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([20, 18]);
+      ctx.beginPath();
+      ctx.moveTo(road.x + road.laneWidth, 0);
+      ctx.lineTo(road.x + road.laneWidth, canvas.height);
+      ctx.moveTo(road.x + road.laneWidth * 2, 0);
+      ctx.lineTo(road.x + road.laneWidth * 2, canvas.height);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Road edge lines
+      ctx.strokeStyle = '#f8fafc';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(road.x, 0);
+      ctx.lineTo(road.x, canvas.height);
+      ctx.moveTo(road.x + road.width, 0);
+      ctx.lineTo(road.x + road.width, canvas.height);
+      ctx.stroke();
+    }
+
+    function drawCar(x, y, width, height, color) {
+      ctx.fillStyle = color;
+      ctx.fillRect(x, y, width, height);
+
+      ctx.fillStyle = '#dbeafe';
+      ctx.fillRect(x + 6, y + 8, width - 12, 16);
+      ctx.fillRect(x + 6, y + height - 18, width - 12, 12);
+
+      ctx.fillStyle = '#111827';
+      ctx.fillRect(x + 2, y + 10, 5, 12);
+      ctx.fillRect(x + width - 7, y + 10, 5, 12);
+      ctx.fillRect(x + 2, y + height - 18, 5, 12);
+      ctx.fillRect(x + width - 7, y + height - 18, 5, 12);
+    }
+
+    function drawPlayer() {
+      drawCar(player.x, player.y, player.width, player.height, '#34d399');
+    }
+
+    function drawObstacles() {
+      obstacles.forEach(obs => drawCar(obs.x, obs.y, obs.width, obs.height, obs.color));
+    }
+
+    function draw() {
+      drawBackground();
+      drawObstacles();
+      drawPlayer();
+    }
+
+    function gameLoop(timestamp) {
+      if (!gameStarted || gameOver) return;
+
+      if (!lastTime) lastTime = timestamp;
+      const delta = (timestamp - lastTime) / 1000;
+      lastTime = timestamp;
+
+      updatePlayer(delta);
+
+      spawnTimer += delta;
+      if (spawnTimer > 0.9) {
+        spawnObstacle();
+        spawnTimer = 0;
+      }
+
+      updateObstacles(delta);
+      draw();
+
+      if (!gameOver) {
+        animationFrameId = requestAnimationFrame(gameLoop);
+      }
+    }
+
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
+        player.moveLeft = true;
+      }
+      if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') {
+        player.moveRight = true;
+      }
+    });
+
+    window.addEventListener('keyup', (event) => {
+      if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
+        player.moveLeft = false;
+      }
+      if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') {
+        player.moveRight = false;
+      }
+    });
+
+    startBtn.addEventListener('click', startGame);
+    homeBtn.addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+
+    resetGame();
+    draw();
+  </script>
+</body>
+</html>
