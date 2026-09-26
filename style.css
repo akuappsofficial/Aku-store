@@ -222,3 +222,134 @@ body {
 .star-icon {
   font-size: 0.8rem !important;
 }
+/* App Details Page Styling */
+.detail-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.detail-header {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.detail-app-icon {
+  width: 96px;
+  height: 96px;
+  border-radius: 20px;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.detail-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.detail-title {
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.detail-developer {
+  font-size: 1rem;
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+.verified-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+
+.verified-tag span {
+  font-size: 0.9rem;
+  color: var(--accent-color);
+}
+
+/* Stats Bar */
+.stats-bar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: var(--surface-color);
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 0.2rem;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 24px;
+  background-color: var(--border-color);
+}
+
+/* Install Button */
+.action-section {
+  margin-bottom: 2rem;
+}
+
+.install-btn {
+  display: block;
+  width: 100%;
+  background-color: var(--accent-color);
+  color: #fff;
+  text-align: center;
+  padding: 0.9rem;
+  border-radius: 24px;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.install-btn:hover {
+  opacity: 0.9;
+}
+
+/* Screenshots Carousel */
+.screenshots-scroll {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  scrollbar-width: thin;
+}
+
+.screenshot-img {
+  height: 220px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.app-description {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 0.95rem;
+  }
