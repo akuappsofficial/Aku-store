@@ -10,76 +10,96 @@
 <body>
 
   <header class="top-nav">
-    <div class="logo" id="backToStoreBtn">
+    <div class="logo" id="backBtn">
       <span class="material-symbols-outlined icon-btn">arrow_back</span>
-      <span>Aku Store Console</span>
+      <span>Developer Portal</span>
     </div>
   </header>
 
-  <main class="detail-container">
-    <h1 class="section-title">Publish New Application</h1>
-    <p style="color: var(--text-secondary); margin-bottom: 2rem;">Upload your Android package (.apk) and store listings directly to GitHub storage.</p>
+  <main class="auth-wrapper">
+    <div class="upload-form">
+      <h1 class="section-title">Publish New App</h1>
+      <form id="uploadAppForm">
+        
+        <div class="form-group">
+          <label for="devAppTitle">App Title</label>
+          <input type="text" id="devAppTitle" placeholder="e.g. My Custom Game" required>
+        </div>
 
-    <form id="uploadForm" class="upload-form">
-      
-      <!-- App Identity -->
-      <div class="form-group">
-        <label for="appName">App Title</label>
-        <input type="text" id="appName" placeholder="e.g. Aku Calculator" required>
-      </div>
+        <div class="form-group">
+          <label for="devPackageId">Package Name (ID)</label>
+          <input type="text" id="devPackageId" placeholder="e.g. com.developer.mygame" required>
+        </div>
 
-      <div class="form-group">
-        <label for="appPackage">Package ID (Unique)</label>
-        <input type="text" id="appPackage" placeholder="e.g. com.aku.calculator" pattern="^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+$" required>
-        <small style="color: var(--text-secondary);">Must follow standard Android format (e.g., com.developer.appname)</small>
-      </div>
+        <div class="form-group">
+          <label for="devCategory">Category</label>
+          <select id="devCategory">
+            <option value="apps">Apps</option>
+            <option value="games">Games</option>
+          </select>
+        </div>
 
-      <div class="form-group">
-        <label for="appCategory">Category</label>
-        <select id="appCategory" required>
-          <option value="apps">Application</option>
-          <option value="games">Game</option>
-        </select>
-      </div>
+        <div class="form-group">
+          <label for="devIconUrl">App Icon URL</label>
+          <input type="url" id="devIconUrl" placeholder="https://example.com/icon.png" required>
+        </div>
 
-      <div class="form-group">
-        <label for="appDesc">Description</label>
-        <textarea id="appDesc" rows="4" placeholder="Describe key features of your application..." required></textarea>
-      </div>
+        <div class="form-group">
+          <label for="devApkUrl">APK Download Direct Link</label>
+          <input type="url" id="devApkUrl" placeholder="https://example.com/app.apk" required>
+        </div>
 
-      <!-- File Inputs with Constraints -->
-      <div class="form-group">
-        <label for="apkFile">Android Binary File (.apk strictly)</label>
-        <input type="file" id="apkFile" accept=".apk" required>
-        <small id="apkFileError" class="error-msg"></small>
-      </div>
+        <div class="form-group">
+          <label for="devAppSize">File Size</label>
+          <input type="text" id="devAppSize" placeholder="e.g. 15 MB" required>
+        </div>
 
-      <div class="form-group">
-        <label for="appIcon">App Icon (512x512 PNG/JPG)</label>
-        <input type="file" id="appIcon" accept="image/png, image/jpeg" required>
-        <small id="iconFileError" class="error-msg"></small>
-      </div>
+        <div class="form-group">
+          <label for="devAppDesc">App Description</label>
+          <textarea id="devAppDesc" rows="4" placeholder="Detailed app capabilities and updates..." required></textarea>
+        </div>
 
-      <!-- GitHub Credentials for API Upload -->
-      <div class="form-group" style="border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 1.5rem;">
-        <label for="ghToken">GitHub Personal Access Token (PAT)</label>
-        <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx" required>
-        <small style="color: var(--text-secondary);">Requires <code>repo</code> access scope to write APK files to your storage repository.</small>
-      </div>
-
-      <div class="form-group">
-        <label for="ghRepo">Storage Repo (username/repo-name)</label>
-        <input type="text" id="ghRepo" placeholder="e.g. AkmalTheCoder93N/aku-apk-storage" required>
-      </div>
-
-      <button type="submit" id="submitBtn" class="install-btn" style="border: none; cursor: pointer; margin-top: 1rem;">
-        Validate & Upload to GitHub
-      </button>
-
-      <div id="statusMessage" class="status-box"></div>
-    </form>
+        <button type="submit" class="install-btn">Publish App</button>
+        <div id="uploadStatus" class="status-box"></div>
+      </form>
+    </div>
   </main>
 
-  <script src="developer.js"></script>
+  <script>
+    document.getElementById('backBtn').addEventListener('click', () => window.location.href = 'index.html');
+
+    document.getElementById('uploadAppForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const session = JSON.parse(localStorage.getItem('aku_store_session') || 'null');
+      if (!session || (session.role !== 'developer' && session.role !== 'admin')) {
+        alert('You need a Developer or Admin account to publish apps.');
+        window.location.href = 'auth.html';
+        return;
+      }
+
+      const newApp = {
+        id: document.getElementById('devPackageId').value.trim(),
+        title: document.getElementById('devAppTitle').value.trim(),
+        developer: session.username || "Developer",
+        rating: 5.0,
+        icon: document.getElementById('devIconUrl').value.trim(),
+        category: document.getElementById('devCategory').value,
+        size: document.getElementById('devAppSize').value.trim(),
+        description: document.getElementById('devAppDesc').value.trim(),
+        apkUrl: document.getElementById('devApkUrl').value.trim()
+      };
+
+      const existingApps = JSON.parse(localStorage.getItem('aku_uploaded_apps') || '[]');
+      existingApps.push(newApp);
+      localStorage.setItem('aku_uploaded_apps', JSON.stringify(existingApps));
+
+      const statusBox = document.getElementById('uploadStatus');
+      statusBox.className = "status-box success";
+      statusBox.innerText = "App published successfully to store!";
+      
+      setTimeout(() => window.location.href = 'index.html', 1200);
+    });
+  </script>
 </body>
 </html>
