@@ -1,10 +1,11 @@
+// Database: App catalog
 const appDatabase = [
   {
     id: "com.aku.vitsdemo",
     title: "VITS Demo Application",
     developer: "M. A. Akmal Ahamed",
     rating: 4.8,
-    icon: "https://upload.wikimedia.org/wikipedia/commons/d/d0/Google_Play_Arrow_logo.svg", // Replace with real icons
+    icon: "https://upload.wikimedia.org/wikipedia/commons/d/d0/Google_Play_Arrow_logo.svg",
     category: "apps",
     size: "12 MB"
   },
@@ -28,7 +29,7 @@ const appDatabase = [
   }
 ];
 
-// Function to generate the HTML for a single app card
+// Generate HTML for an individual app card
 function createAppCard(app) {
   return `
     <div class="app-card" onclick="openAppDetails('${app.id}')">
@@ -46,31 +47,34 @@ function createAppCard(app) {
   `;
 }
 
-// Function to inject apps into the grid
+// Inject app cards into the store grid
 function renderAppGrid(apps) {
   const gridContainer = document.getElementById('appGridContainer');
-  gridContainer.innerHTML = ''; // Clear loading states or old data
-  
+  if (!gridContainer) return;
+
+  if (apps.length === 0) {
+    gridContainer.innerHTML = `<p style="color: var(--text-secondary); grid-column: 1/-1;">No apps found matching your query.</p>`;
+    return;
+  }
+
+  gridContainer.innerHTML = '';
   apps.forEach(app => {
     gridContainer.innerHTML += createAppCard(app);
   });
 }
 
-// Navigation Tab Logic (Switch between Apps, Games, Recent)
+// Navigation Tabs (Apps, Games, Recent)
 function setupTabs() {
   const tabs = document.querySelectorAll('.tab');
   
   tabs.forEach(tab => {
     tab.addEventListener('click', (e) => {
-      // Remove active class from all
       tabs.forEach(t => t.classList.remove('active'));
-      // Add active class to clicked
       e.target.classList.add('active');
       
-      // Filter the database based on the tab's data-category
       const category = e.target.getAttribute('data-category');
       if (category === 'recent') {
-        renderAppGrid(appDatabase); // Just show all for 'recent' right now
+        renderAppGrid(appDatabase);
       } else {
         const filteredApps = appDatabase.filter(app => app.category === category);
         renderAppGrid(filteredApps);
@@ -79,13 +83,48 @@ function setupTabs() {
   });
 }
 
-// Replace the old openAppDetails function with this:
+// Search input handling
+function setupSearch() {
+  const searchInput = document.getElementById('searchInput');
+  if (!searchInput) return;
+
+  searchInput.addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase().trim();
+    const matchedApps = appDatabase.filter(app => 
+      app.title.toLowerCase().includes(query) || 
+      app.developer.toLowerCase().includes(query) ||
+      app.id.toLowerCase().includes(query)
+    );
+    renderAppGrid(matchedApps);
+  });
+}
+
+// Developer Console & Header Button Listeners
+function setupHeaderActions() {
+  const devDashboardBtn = document.getElementById('devDashboardBtn');
+  if (devDashboardBtn) {
+    devDashboardBtn.addEventListener('click', () => {
+      window.location.href = 'developer.html';
+    });
+  }
+
+  const userProfileBtn = document.getElementById('userProfileBtn');
+  if (userProfileBtn) {
+    userProfileBtn.addEventListener('click', () => {
+      alert("Profile and Authentication setup coming in Phase 5!");
+    });
+  }
+}
+
+// Redirect to dynamic detail page
 function openAppDetails(appId) {
   window.location.href = `app.html?id=${appId}`;
 }
 
-// Initialize the store when the page loads
+// Initialize on page load
 window.onload = () => {
-  renderAppGrid(appDatabase); // Load all apps initially
+  renderAppGrid(appDatabase);
   setupTabs();
-}; 
+  setupSearch();
+  setupHeaderActions();
+};
