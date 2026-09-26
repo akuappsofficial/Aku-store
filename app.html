@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>App Details | Aku Store</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+</head>
+<body>
+
+  <!-- Top Navigation with Back Arrow -->
+  <header class="top-nav">
+    <div class="logo" id="backBtn">
+      <span class="material-symbols-outlined icon-btn">arrow_back</span>
+      <span>Aku Store</span>
+    </div>
+    
+    <div class="user-actions">
+      <span class="material-symbols-outlined icon-btn">share</span>
+      <div class="profile-avatar">
+        <span class="material-symbols-outlined">person</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- App Detail Content -->
+  <main class="detail-container">
+    
+    <!-- Hero Header (Icon, Title, Dev, Install Button) -->
+    <section class="detail-header">
+      <img id="detailIcon" src="" alt="App Icon" class="detail-app-icon">
+      <div class="detail-meta">
+        <h1 id="detailTitle" class="detail-title">Loading...</h1>
+        <span id="detailDeveloper" class="detail-developer">Loading...</span>
+        <span class="verified-tag"><span class="material-symbols-outlined">verified</span> Verified Developer</span>
+      </div>
+    </section>
+
+    <!-- Quick Stats Bar -->
+    <section class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-value"><span id="detailRating">0.0</span> <span class="material-symbols-outlined star-icon">star</span></div>
+        <div class="stat-label">Reviews</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-value" id="detailSize">0 MB</div>
+        <div class="stat-label">File Size</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-value">3+</div>
+        <div class="stat-label">PEGI Rating</div>
+      </div>
+    </section>
+
+    <!-- Download APK Action Button -->
+    <section class="action-section">
+      <a id="downloadBtn" href="#" class="install-btn" target="_blank">Download APK</a>
+    </section>
+
+    <!-- Media Screenshots Horizontal Carousel -->
+    <section class="screenshots-section">
+      <h2 class="section-title">Preview</h2>
+      <div class="screenshots-scroll" id="screenshotsContainer">
+        <!-- Injected via JavaScript -->
+      </div>
+    </section>
+
+    <!-- App Description -->
+    <section class="description-section">
+      <h2 class="section-title">About this app</h2>
+      <p id="detailDescription" class="app-description">Loading application details...</p>
+    </section>
+
+  </main>
+
+  <script src="details.js"></script>
+</body>
+</html> 
